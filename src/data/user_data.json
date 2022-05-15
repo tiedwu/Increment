@@ -21007,7 +21007,7 @@
             "guard": 3,
             "camp": 3
         },
-        "resources": 38474893721,
+        "resources": 38494553249,
         "resources_increase": 156028,
         "residents": 100125,
         "residents_increase": 20000,
@@ -21017,10 +21017,10 @@
             "archer": 0,
             "cavalryman": 22111
         },
-        "mines": 7789298957,
+        "mines": 7833298957,
         "crystal": 1279,
-        "double_gathering_time": 18222,
+        "double_gathering_time": 17970,
         "double_payload_time": 0,
-        "crystal_remain_countdown": 171
+        "crystal_remain_countdown": 423
     }
 }
