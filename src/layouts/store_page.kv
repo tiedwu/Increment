@@ -57,7 +57,7 @@
                     halign: 'left'
                     valign: 'middle'
             BoxLayout:
-                padding: 10, 6
+                padding: 10, 10
                 StoreLabel:
                     #font_size: '13sp'
                     text: u"资源生产量和采集量翻倍, 1小时50水晶"
@@ -94,7 +94,7 @@
                     halign: 'left'
                     valign: 'middle'
             BoxLayout:
-                padding: 10, 6
+                padding: 10, 10
                 StoreLabel:
                     text: u"瞬间完成500次资源采集, 15水晶"
                 StoreButton:
@@ -127,7 +127,7 @@
                     halign: 'left'
                     valign: 'middle'
             BoxLayout:
-                padding: 10, 6
+                padding: 10, 10
                 StoreLabel:
                     text: u"瞬间获得1小时的资源生产量, 200水晶"
                 StoreButton:
@@ -161,7 +161,7 @@
                     halign: 'left'
                     valign: 'middle'
             BoxLayout:
-                padding: 10, 6
+                padding: 10, 10
                 StoreLabel:
                     text: u"有效期内双倍负重, 1小时50水晶"
                 StoreButton:
@@ -198,7 +198,7 @@
                     halign: 'left'
                     valign: 'middle'
             BoxLayout:
-                padding: 10, 6
+                padding: 10, 10
                 StoreLabel:
                     #font_size: '13sp'
                     text: u"解散军队, 25水晶"
@@ -210,33 +210,35 @@
                     size_hint: .1, 1
                     text: ""
         BoxLayout:
-            size_hint: 1, .25
+            canvas.before:
+                Color:
+                    rgba: 0, 0, 0, 1
+                Line:
+                    width: 2
+                    rectangle: self.x, self.y, self.width, self.height
+            size_hint: 1, .2
             orientation: 'vertical'
             BoxLayout:
-                spacing: 30
-                padding: 10, 25
+				size_hint: 1, .3
+                spacing: 11
+                padding: 10, 20
                 StoreLabel:
                     size_hint: .2, 1
                     text: u"福利码"
-                AnchorLayout:
+                StoreTextInput:
                     size_hint: .6, 1
-                #padding: 10
-                #Button:
-                    #text: "TEST"
-                    StoreTextInput:
-						id: _bonus_code
-                        size_hint: .99, .99
-                    #hint_text: '%s, %s' % (self.get_center_x(), self.get_center_y())
-                        hint_text: u'加群可获取更多福利码'
-                        multiline: False
-                    #size: 200, 30
-                        pos_hint: {'x': .1}
+                    #StoreTextInput:
+					id: _bonus_code
+                    #size_hint: .99, .99
+                    hint_text: u'加群可获取更多福利码'
+                    multiline: False
+                    #pos_hint: {'x': .1}
                 StoreButton:
 					id: _take_bonus
                     size_hint: .2, 1
                     text: u"兑换"
             BoxLayout:
-				size_hint: 1, .2
+				size_hint: 1, .3
                 StoreLabel:
                     size_hint: .22, 1
                     font_size: '13sp'
@@ -257,12 +259,12 @@
                     size_hint: .5, 1
                     text: u"每30分钟增加一次, 上限50"
             BoxLayout:
+				size_hint: 1, .3
                 padding: 50, 10
                 spacing: 50
                 StoreButton:
 					id: _adv_watching
                     text: "看广告 50水晶"
-					#on_release: Factory.AdvWidget().open() 
                 StoreButton:
                     id: _get_crystal_15
                     text: "不看广告 15水晶"
