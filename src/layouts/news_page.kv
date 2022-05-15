@@ -73,7 +73,7 @@
 		NewsLabel:
 			text: root.enemy_resources
 			text_size: self.size
-			valihn: 'middle'
+			valign: 'middle'
 			halign: 'left'
 		NewsLabel:
 			text: root.resources_robbed
@@ -97,6 +97,7 @@
 			id: _rv_news
 			viewclass: 'StatefulLabel'
 			RecycleBoxLayout:
+				default_size: None, self.parent.height / 5
 				default_size_hint: 1, None
 				size_hint_y: None
 				height: self.minimum_height
