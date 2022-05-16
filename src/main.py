@@ -1,5 +1,5 @@
 
-__version__ = '0.8'
+__version__ = '1.0'
 
 from kivy.uix.screenmanager import ScreenManager
 from kivy.app import App
