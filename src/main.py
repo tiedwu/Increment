@@ -457,6 +457,12 @@ class RootWidget(BoxLayout):
 		print("train lancer")
 		unit = self.ids["_multipage"].ids["_militarypage"].unit
 		if unit != 0:
+			next_military = self.ids._multipage.ids._militarypage.lancer + \
+				self.ids._multipage.ids._militarypage.shieldman + \
+				self.ids._multipage.ids._militarypage.archer + \
+				self.ids._multipage.ids._militarypage.cavalryman + unit
+			if next_military > self.ids._multipage.ids._buildingpage.camp * 5:
+				return
 			cost = self.ids["_multipage"].ids["_militarypage"].get_train_cost('lancer') * unit
 			if self.ids["_maininfo"].resources >= cost:
 				lancer = self.ids["_multipage"].ids["_militarypage"].lancer + unit
@@ -475,6 +481,12 @@ class RootWidget(BoxLayout):
 		print("train shieldman")
 		unit = self.ids["_multipage"].ids["_militarypage"].unit
 		if unit != 0:
+			next_military = self.ids._multipage.ids._militarypage.lancer + \
+				self.ids._multipage.ids._militarypage.shieldman + \
+				self.ids._multipage.ids._militarypage.archer + \
+				self.ids._multipage.ids._militarypage.cavalryman + unit
+			if next_military > self.ids._multipage.ids._buildingpage.camp * 5:
+				return
 			cost = self.ids["_multipage"].ids["_militarypage"].get_train_cost('shieldman') * unit
 			if self.ids["_maininfo"].resources >= cost:
 				shieldman = self.ids["_multipage"].ids["_militarypage"].shieldman + unit
@@ -493,6 +505,12 @@ class RootWidget(BoxLayout):
 		print("train archer")
 		unit = self.ids["_multipage"].ids["_militarypage"].unit
 		if unit != 0:
+			next_military = self.ids._multipage.ids._militarypage.lancer + \
+				self.ids._multipage.ids._militarypage.shieldman + \
+				self.ids._multipage.ids._militarypage.archer + \
+				self.ids._multipage.ids._militarypage.cavalryman + unit
+			if next_military > self.ids._multipage.ids._buildingpage.camp * 5:
+				return
 			cost = self.ids["_multipage"].ids["_militarypage"].get_train_cost('archer') * unit
 			if self.ids["_maininfo"].resources >= cost:
 				archer = self.ids["_multipage"].ids["_militarypage"].archer + unit
@@ -508,6 +526,12 @@ class RootWidget(BoxLayout):
 		print("train cavalryman")
 		unit = self.ids["_multipage"].ids["_militarypage"].unit
 		if unit != 0:
+			next_military = self.ids._multipage.ids._militarypage.lancer + \
+				self.ids._multipage.ids._militarypage.shieldman + \
+				self.ids._multipage.ids._militarypage.archer + \
+				self.ids._multipage.ids._militarypage.cavalryman + unit
+			if next_military > self.ids._multipage.ids._buildingpage.camp * 5:
+				return
 			cost = self.ids["_multipage"].ids["_militarypage"].get_train_cost('cavalryman') * unit
 			if self.ids["_maininfo"].resources >= cost:
 				cavalryman = self.ids["_multipage"].ids["_militarypage"].cavalryman + unit
