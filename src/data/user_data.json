@@ -21005,22 +21005,22 @@
             "castle": 20000,
             "house": 20025,
             "guard": 3,
-            "camp": 3
+            "camp": 5
         },
-        "resources": 38495177361,
-        "resources_increase": 156028,
+        "resources": 38502228001,
+        "resources_increase": 154028,
         "residents": 100125,
         "residents_increase": 20000,
         "soldiers": {
             "lancer": 0,
             "shieldman": 0,
             "archer": 0,
-            "cavalryman": 22111
+            "cavalryman": 23111
         },
-        "mines": 7833298957,
+        "mines": 7851298957,
         "crystal": 1279,
-        "double_gathering_time": 17962,
+        "double_gathering_time": 17865,
         "double_payload_time": 0,
-        "crystal_remain_countdown": 431
+        "crystal_remain_countdown": 528
     }
 }
