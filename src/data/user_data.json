@@ -21007,7 +21007,7 @@
             "guard": 3,
             "camp": 3
         },
-        "resources": 38494553249,
+        "resources": 38495177361,
         "resources_increase": 156028,
         "residents": 100125,
         "residents_increase": 20000,
@@ -21019,8 +21019,8 @@
         },
         "mines": 7833298957,
         "crystal": 1279,
-        "double_gathering_time": 17970,
+        "double_gathering_time": 17962,
         "double_payload_time": 0,
-        "crystal_remain_countdown": 423
+        "crystal_remain_countdown": 431
     }
 }
