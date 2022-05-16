@@ -1,5 +1,5 @@
 
-__version__ = '0.7'
+__version__ = '0.8'
 
 from kivy.uix.screenmanager import ScreenManager
 from kivy.app import App
@@ -13,6 +13,10 @@ import json
 import random
 import datetime
 from kivy.factory import Factory
+
+# set keyboard below target
+from kivy.core.window import WindowBase
+WindowBase.softinput_mode = 'below_target'
 
 LAYOUT_DIR = "layouts"
 Builder.load_file("%s/layout.kv" % LAYOUT_DIR)
