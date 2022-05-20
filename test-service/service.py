@@ -33,6 +33,12 @@ if __name__ == '__main__':
 		from jnius import autoclass
 		PythonService = autoclass('org.kivy.android.PythonService')
 
+		#from android.broadcast import BroadcastReceiver
+		#broadcast_receiver = BroadcastReceiver(
+
+		#)
+		#broadcast_receiver.start()
+
 	server = GameService()
 
 	num = 0
