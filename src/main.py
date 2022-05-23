@@ -13,6 +13,11 @@ import json
 import random
 import datetime
 from kivy.factory import Factory
+from kivy.utils import platform
+
+# import osc
+from oscpy.client import OSCClient
+from oscpy.server import OSCThreadServer
 
 # set keyboard below target
 from kivy.core.window import WindowBase
@@ -25,7 +30,7 @@ Builder.load_file("%s/building_page.kv" % LAYOUT_DIR)
 Builder.load_file("%s/military_page.kv" % LAYOUT_DIR)
 Builder.load_file("%s/war_page.kv" % LAYOUT_DIR)
 Builder.load_file("%s/store_page.kv" % LAYOUT_DIR)
-Builder.load_file("%s/news_page.kv" % LAYOUT_DIR) 
+Builder.load_file("%s/news_page.kv" % LAYOUT_DIR)
 
 class MainInfo(BoxLayout):
 	nickname = 'Admin'
@@ -63,9 +68,6 @@ class RootWidget(BoxLayout):
 
 		# remove me from enemy_data
 		self.enemy_data.pop(self.userid)
-		#if self.userid in self.enemy_data.keys():
-		#	print("IN")
-		#print(self.enemy_data)
 
 		# init maininfo labels
 		self.ids["_maininfo"].userid = self.userid
@@ -274,10 +276,6 @@ class RootWidget(BoxLayout):
 				next_index = MAX - 1
 			index_str = '%03d' % next_index
 			data[index_str] = result
-		#print(data)
-
-		# update news page
-		#self.ids._multipage.ids._newspage.update()
 
 		# save data
 		with open(file, "w", encoding='utf-8') as f:
@@ -543,12 +541,21 @@ class RootWidget(BoxLayout):
 					self.ids._multipage.ids._warpage.cavalryman_max = cavalryman
 					self.ids._multipage.ids._warpage.update()
 
+	def service_resources_decrease(self, cost):
+		cost_str = str(cost).encode('utf8')
+		App.get_running_app().client.send_message(\
+			b'/resources_decrease', [cost_str])
+
 	def upgrade_castle(self, instance):
         #print("upgrade castle")
         #print(instance)
 		cost = self.ids["_multipage"].ids["_buildingpage"].castle_cost
 		if self.ids["_maininfo"].resources >= cost:
-			self.ids["_maininfo"]. resources -= cost
+			# move to service
+			self.service_resources_decrease(cost)
+			#cost_str = str(cost).encode('utf8')
+			#client.send_message(b'res_des', [cost_str])
+			#self.ids["_maininfo"]. resources -= cost
 			self.ids["_multipage"].ids["_buildingpage"].castle += 1
 			lv = self.ids["_multipage"].ids["_buildingpage"].castle
 			cost_upgrade = self.ids["_multipage"].ids["_buildingpage"].calc_cost('castle', lv) 
@@ -562,7 +569,9 @@ class RootWidget(BoxLayout):
 	def upgrade_house(self, instance):
 		cost = self.ids["_multipage"].ids["_buildingpage"].house_cost
 		if self.ids["_maininfo"].resources >= cost:
-			self.ids["_maininfo"]. resources -= cost
+			# move to service
+			self.service_resources_decrease(cost)
+			#self.ids["_maininfo"]. resources -= cost
 			self.ids["_multipage"].ids["_buildingpage"].house += 1
 			lv = self.ids["_multipage"].ids["_buildingpage"].house
 			cost_upgrade = self.ids["_multipage"].ids["_buildingpage"].calc_cost('house', lv) 
@@ -573,7 +582,9 @@ class RootWidget(BoxLayout):
 	def upgrade_guard(self, instance):
 		cost = self.ids["_multipage"].ids["_buildingpage"].guard_cost
 		if self.ids["_maininfo"].resources >= cost:
-			self.ids["_maininfo"]. resources -= cost
+			# move to service
+			self.service_resources_decrease(cost)
+			#self.ids["_maininfo"]. resources -= cost
 			self.ids["_multipage"].ids["_buildingpage"].guard += 1
 			lv = self.ids["_multipage"].ids["_buildingpage"].guard
 			cost_upgrade = self.ids["_multipage"].ids["_buildingpage"].calc_cost('guard', lv) 
@@ -584,7 +595,9 @@ class RootWidget(BoxLayout):
 	def upgrade_camp(self, instance):
 		cost = self.ids["_multipage"].ids["_buildingpage"].camp_cost
 		if self.ids["_maininfo"].resources >= cost:
-			self.ids["_maininfo"]. resources -= cost
+			# move to service
+			self.service_resources_decrease(cost)
+			#self.ids["_maininfo"]. resources -= cost
 			self.ids["_multipage"].ids["_buildingpage"].camp += 1
 			lv = self.ids["_multipage"].ids["_buildingpage"].camp
 			cost_upgrade = self.ids["_multipage"].ids["_buildingpage"].calc_cost('camp', lv) 
@@ -627,19 +640,23 @@ class RootWidget(BoxLayout):
 
 		labors = self.ids["_maininfo"].residents - soldiers
 		self.ids["_multipage"].ids["_managepage"].labors = labors
-		self.ids["_maininfo"].resources_increase = labors
+		# self.ids["_maininfo"].resources_increase = labors
 
+		# move to service
 		# check double gathering time
-		if self.ids._multipage.ids._storepage.double_gathering_time > 0:
-			#print("double gathering remaining...")
-			self.ids._maininfo.resources_increase = \
-				self.ids._maininfo.resources_increase * 2 
-		self.ids["_maininfo"].resources += \
-			self.ids["_multipage"].ids["_managepage"].labors
+		#if self.ids._multipage.ids._storepage.double_gathering_time > 0:
+		#	#print("double gathering remaining...")
+		#	self.ids._maininfo.resources_increase = \
+		#		self.ids._maininfo.resources_increase * 2
+
+		# move to service
+		#self.ids["_maininfo"].resources += \
+		#	self.ids["_multipage"].ids["_managepage"].labors
 
 		# store page: double_gathering_time count down
-		if self.ids._multipage.ids._storepage.double_gathering_time > 0:
-			self.ids._multipage.ids._storepage.double_gathering_time -= 1
+		# move to service
+		#if self.ids._multipage.ids._storepage.double_gathering_time > 0:
+		#	self.ids._multipage.ids._storepage.double_gathering_time -= 1
 		# store page: double_payload_time count down
 		if self.ids._multipage.ids._storepage.double_payload_time > 0:
 			self.ids._multipage.ids._storepage.double_payload_time -= 1
@@ -685,60 +702,115 @@ class RootWidget(BoxLayout):
 			increase = increase * 2
 		self.ids._multipage.ids._managepage.gathering_capacity = increase
 		if self.ids["_multipage"].ids["_managepage"].mines >= increase:
-			self.ids["_maininfo"].resources += increase
+			# move to service
+			ins_str = str(increase).encode('utf8')
+			App.get_running_app().client.send_message(b'/resources_increase', [ins_str])
+			#self.ids["_maininfo"].resources += increase
 			self.ids["_multipage"].ids["_managepage"].mines -= increase
         #self.update()
 
+	def resources_received(self, res, ins, remain):
+		print("showing resources", res.decode('utf8'))
+		print("showing increase: ", ins.decode('utf8'))
+		print("showing dg time: ", remain.decode('utf8'))
+		#msg = message.decode('utf8')
+		#value = int(msg)
+		self.ids._maininfo.resources = int(res.decode('utf8'))
+		self.ids._maininfo.resources_increase = int(ins.decode('utf8'))
+		self.ids._multipage.ids._storepage.double_gathering_time = \
+			int(remain.decode('utf8'))
+
 class GameApp(App):
-    
-    userid = "999999"
-    data_path = "data/user_data.json"
-    data = {}
+	userid = "999999"
+	data_path = "data/user_data.json"
+	data = {}
 
-    def build(self):
-        Window.bind(on_request_close=self.on_quit)
-        self.check_user(self.userid)
-        root = RootWidget(userid=self.userid, data=self.data)
-        Clock.schedule_interval(self._update, 1.0)
-        return root
+	def __init__(self, **kwargs):
+		super().__init__(**kwargs)
 
-    def _update(self, dt):
-        self.root.update()
-        self.save_data()
+		if platform == 'android':
+			self.start_service()
+		elif platform in ('linux', 'win'):
+			from runpy import run_path
+			from threading import Thread
+			self.service = Thread(
+				target=run_path,
+				#args=['service/main.py'],
+				args=['service.py'],
+				kwargs={'run_name': '__main__'},
+				daemon=True
+			)
+			self.service.start()
+		else:
+			raise NotImplementedError(
+				"service start not implemented on this platform"
+			)
 
-    def create_user(self):
-        user_data = {\
-                "nickname": "Admin",\
-                "buildings": {"castle": 0, "house": 0, "guard": 0, "camp": 0}, \
-                "resources": 0, "resources_increase": 0, \
-                "residents": 0, "residents_increase": 0, \
-                "soldiers": {"lancer": 0, "shieldman": 0, "archer": 0, "cavalryman": 0}, \
-                "mines": 0, "crystal": 0, "double_gathering_time": 0, \
-				"double_payload_time": 0, "crystal_remain_countdown": 0}
-        self.data[self.userid] = user_data
+	@staticmethod
+	def start_service():
+		from jnius import autoclass
+		service = autoclass('org.kivy.empire_era.ServiceEmpire')
+		mActivity = autoclass('org.kivy.android.PythonActivity').mActivity
+		service.start(mActivity, "")
+		return service
 
-    def check_user(self, userid="999999"):
-        if not exists(self.data_path):
-            self.create_user()
-        else:
-            with open(self.data_path, "r") as f:
-                self.data = json.load(f)
-            if not userid in self.data.keys():
-                self.create_user()
+	def build(self):
+		Window.bind(on_request_close=self.on_quit)
+		self.check_user(self.userid)
+		root = RootWidget(userid=self.userid, data=self.data)
+		Clock.schedule_interval(self._update, 1.0)
 
-    def save_data(self):
-        """
-        data = {"admin": {"resources": 0}}
-        """
-        self.data[self.userid] = self.root.data
-        
-        # save chinese in json with indent=4
-        with open(self.data_path, "w", encoding='utf-8') as f:
-            json.dump(self.data, f, indent=4, ensure_ascii=False)
-        #print("saved!")
+		self.server = server = OSCThreadServer()
+		server.listen(
+			address=b'localhost', port=3002, default=True) 
 
-    def on_quit(self, *args):
-        self.save_data()    
-    
+		# bind triggers
+		server.bind(b'/resources', root.resources_received)
+
+		self.client = OSCClient(b'localhost', 3000)
+		#server.bind(b'/data', self.try_msg)
+		return root
+
+	def on_resume(self):
+		print("resume!!")
+
+	def try_msg(self, msg):
+		print("Got")
+
+	def _update(self, dt):
+		self.root.update()
+		self.save_data()
+
+	def create_user(self):
+		user_data = {\
+			"nickname": "Admin",\
+			"buildings": {"castle": 0, "house": 0, "guard": 0, "camp": 0}, \
+			"resources": 0, "resources_increase": 0, \
+			"residents": 0, "residents_increase": 0, \
+			"soldiers": \
+				{"lancer": 0, "shieldman": 0, "archer": 0, "cavalryman": 0}, \
+			"mines": 0, "crystal": 0, "double_gathering_time": 0, \
+			"double_payload_time": 0, "crystal_remain_countdown": 0}
+		self.data[self.userid] = user_data
+
+	def check_user(self, userid="999999"):
+		if not exists(self.data_path):
+			self.create_user()
+		else:
+			with open(self.data_path, "r") as f:
+				self.data = json.load(f)
+			if not userid in self.data.keys():
+				self.create_user()
+
+	def save_data(self):
+		self.data[self.userid] = self.root.data
+
+		# save chinese in json with indent=4
+		with open(self.data_path, "w", encoding='utf-8') as f:
+			json.dump(self.data, f, indent=4, ensure_ascii=False)
+
+	def on_quit(self, *args):
+		self.save_data()
+
 if __name__ == '__main__':
     GameApp().run()
