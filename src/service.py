@@ -24,6 +24,42 @@ class GameService(OSCThreadServer):
 		self.listen('localhost', port=3000, default=True)
 		self.bind(b'/resources_increase', self.res_inc)
 		self.bind(b'/resources_decrease', self.res_dec)
+		self.bind(b'/dismiss_military', self.dismiss)
+		self.bind(b'/set_lancer', self.set_lancer)
+		self.bind(b'/set_shieldman', self.set_shieldman)
+		self.bind(b'/set_archer', self.set_archer)
+		self.bind(b'/set_cavalryman', self.set_cavalryman)
+		self.bind(b'/gain_double_gathering', self.gain_double_gathering)
+		self.bind(b'/gain_double_payload', self.gain_double_payload)
+
+	def gain_double_gathering(self, arg):
+		gain = int(arg.decode('utf8'))
+		self.data["double_gathering_time"] += gain
+
+	def gain_double_payload(self, arg):
+		gain = int(arg.decode('utf8'))
+		self.data["double_payload_time"] += gain
+
+	def set_lancer(self, arg):
+		unit = int(arg.decode('utf8'))
+		self.data["soldiers"]["lancer"] = unit
+
+	def set_shieldman(self, arg):
+		unit = int(arg.decode('utf8'))
+		self.data["soldiers"]["shieldman"] = unit
+
+	def set_archer(self, arg):
+		unit = int(arg.decode('utf8'))
+		self.data["soldiers"]["archer"] = unit
+
+	def set_cavalryman(self, arg):
+		unit = int(arg.decode('utf8'))
+		self.data["soldiers"]["cavalryman"] = unit
+
+	def dismiss(self):
+		print("service(): dismiss_military")
+		for k in self.data["soldiers"].keys():
+			self.data["soldiers"][k] = 0
 
 	def res_inc(self, arg):
 		inc = int(arg.decode('utf8'))
@@ -50,6 +86,7 @@ class GameService(OSCThreadServer):
 
 	def check_data(self):
 		soldiers = self.get_soldiers()
+		#print("soldiers: %d" % soldiers)
 
 		# resident - soldiers = labors = increase for normal
 		self.labors = increase = self.data["residents"] - soldiers
@@ -58,12 +95,17 @@ class GameService(OSCThreadServer):
 			increase = increase * 2
 			self.data["double_gathering_time"] -= 1
 		self.data["resources"] += increase
-		print("send resources %d" % self.data["resources"])
+		#print("send resources %d" % self.data["resources"])
+
+		# check double_payload_time
+		if self.data["double_payload_time"] > 0:
+			self.data["double_payload_time"] -= 1
 		#self.count += 1
 		res = str(self.data["resources"]).encode('utf8')
-		ins = str(increase).encode('utf8')
-		remain = str(self.data["double_gathering_time"]).encode('utf8')
-		CLIENT.send_message(b'/resources', [res, ins, remain])
+		inc = str(increase).encode('utf8')
+		dg_remain = str(self.data["double_gathering_time"]).encode('utf8')
+		dp_remain = str(self.data["double_payload_time"]).encode('utf8')
+		CLIENT.send_message(b'/resources', [res, inc, dg_remain, dp_remain])
 
 if __name__ == '__main__':
 	if platform == 'android':

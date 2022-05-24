@@ -11554,7 +11554,7 @@
         "buildings": {
             "castle": 0,
             "house": 0,
-            "guard": 26,
+            "guard": 0,
             "camp": 0
         },
         "resources": 126122875,
@@ -21005,7 +21005,7 @@
             "castle": 20004,
             "house": 20028,
             "guard": 17,
-            "camp": 3567
+            "camp": 5044 
         },
         "resources": 38069736572,
         "resources_increase": 154028,

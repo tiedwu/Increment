@@ -164,7 +164,10 @@ class RootWidget(BoxLayout):
 		if code == "crystal888":
 			self.ids._maininfo.crystal += 1000
 		if code == "resources666":
-			self.ids._maininfo.resources += 5000000000
+			# move to service
+			bonus = 5000000000
+			self.service_resources_increase(bonus)
+			#self.ids._maininfo.resources += bonus
 		self.ids._multipage.ids._storepage.ids._bonus_code.text = ""
 
 	def double_gathering(self, instance):
@@ -173,7 +176,8 @@ class RootWidget(BoxLayout):
 			return
 		self.ids._maininfo.crystal -= 50
 
-		self.ids._multipage.ids._storepage.double_gathering_time += 3600
+		self.service_double_gathering()
+		#self.ids._multipage.ids._storepage.double_gathering_time += 3600
 		self.ids._multipage.ids._storepage.update()
 
 	def double_payload(self, instance):
@@ -181,7 +185,8 @@ class RootWidget(BoxLayout):
 			return
 		self.ids._maininfo.crystal -= 50
 
-		self.ids._multipage.ids._storepage.double_payload_time += 3600
+		self.service_double_payload()
+		#self.ids._multipage.ids._storepage.double_payload_time += 3600
 		self.ids._multipage.ids._storepage.update()
 
 	def rapid_gathering(self, instance):
@@ -198,7 +203,9 @@ class RootWidget(BoxLayout):
 			increase = increase * 2
 		self.ids._multipage.ids._managepage.gathering_capacity = increase
 		if self.ids["_multipage"].ids["_managepage"].mines >= increase:
-			self.ids["_maininfo"].resources += increase
+			# move to service
+			self.service_resources_increase(increase)
+			#self.ids["_maininfo"].resources += increase
 			self.ids["_multipage"].ids["_managepage"].mines -= increase
 
 	def resources_produce(self, instance):
@@ -207,7 +214,9 @@ class RootWidget(BoxLayout):
 			return
 		self.ids._maininfo.crystal -= 200
 		produce = self.ids._maininfo.resources_increase * 3600
-		self.ids._maininfo.resources += produce
+		# move to service
+		self.service_resources_increase(produce)
+		#self.ids._maininfo.resources += produce
 		#print("resources produce:" , produce)
 
 	def dismiss_military(self, instance):
@@ -222,6 +231,9 @@ class RootWidget(BoxLayout):
 		self.ids._multipage.ids._militarypage.archer = 0
 		self.ids._multipage.ids._militarypage.cavalryman = 0
 		self.ids._multipage.ids._militarypage.update()
+
+		# sync to service
+		self.service_dismiss_military()
 
 	def target_enemy(self, instance):
         # get enemy id
@@ -302,8 +314,9 @@ class RootWidget(BoxLayout):
 		self.ids._multipage.ids._militarypage.archer -= campaign_soldiers["archer"]
 		self.ids._multipage.ids._militarypage.cavalryman -= campaign_soldiers["cavalryman"]
 		print("Before resources: ", self.ids._maininfo.resources)
-		# resources consuming
-		self.ids._maininfo.resources -= int(resources_cost)
+		# resources consuming: move to service
+		self.service_resources_decrease(int(resources_cost))
+		#self.ids._maininfo.resources -= int(resources_cost)
 		print("After resources: ", self.ids._maininfo.resources)
 
 		result = self.ids._multipage.ids._warpage.campaign()
@@ -331,7 +344,11 @@ class RootWidget(BoxLayout):
 
 		self.ids._multipage.ids._warpage.resources_rob = resources_rob
 		print("rob: ", resources_rob)
-		self.ids._maininfo.resources = int(self.ids._maininfo.resources + resources_rob)
+
+		# move to service
+		self.service_resources_increase(resources_rob)
+
+		#self.ids._maininfo.resources = int(self.ids._maininfo.resources + resources_rob)
 		print("After rob resources: ", self.ids._maininfo.resources)
 		self.ids._maininfo.update()
 
@@ -371,6 +388,13 @@ class RootWidget(BoxLayout):
 		soldiers["archer"] += result["soldiers"]["archer"]
 		soldiers["cavalryman"] += result["soldiers"]["cavalryman"]
 		self.ids._multipage.ids._militarypage.set_soldiers(soldiers)
+
+		# sync to service
+		self.service_set_military('lancer', soldiers["lancer"])
+		self.service_set_military('shieldman', soldiers["shieldman"])
+		self.service_set_military('archer', soldiers["archer"])
+		self.service_set_military('cavalryman', soldiers["cavalryman"])
+
 		self.ids._multipage.ids._militarypage.update()
 		# set max of sliders in war page
 		self.ids._multipage.ids._warpage.lancer_max =\
@@ -461,17 +485,23 @@ class RootWidget(BoxLayout):
 				self.ids._multipage.ids._militarypage.cavalryman + unit
 			if next_military > self.ids._multipage.ids._buildingpage.camp * 5:
 				return
+			if next_military >  self.ids._maininfo.residents:
+				return
 			cost = self.ids["_multipage"].ids["_militarypage"].get_train_cost('lancer') * unit
 			if self.ids["_maininfo"].resources >= cost:
 				lancer = self.ids["_multipage"].ids["_militarypage"].lancer + unit
-				if self.ids["_maininfo"].residents >=  lancer:
-					self.ids["_multipage"].ids["_militarypage"].lancer = lancer
-					self.ids["_maininfo"].resources -= cost
-					self.ids["_multipage"].ids["_militarypage"].update()
+				#if self.ids["_maininfo"].residents >=  lancer:
+				self.ids["_multipage"].ids["_militarypage"].lancer = lancer
+				# sync to service
+				self.service_set_military('lancer', lancer)
+				# move to service
+				self.service_resources_decrease(cost)
+				#self.ids["_maininfo"].resources -= cost
+				self.ids["_multipage"].ids["_militarypage"].update()
 
-					# sync to war page
-					self.ids._multipage.ids._warpage.lancer_max = lancer
-					self.ids._multipage.ids._warpage.update()
+				# sync to war page
+				self.ids._multipage.ids._warpage.lancer_max = lancer
+				self.ids._multipage.ids._warpage.update()
         # set unit = 0 after done
         #self.ids["_multipage"].ids["_militarypage"].unit = 0
 
@@ -485,16 +515,22 @@ class RootWidget(BoxLayout):
 				self.ids._multipage.ids._militarypage.cavalryman + unit
 			if next_military > self.ids._multipage.ids._buildingpage.camp * 5:
 				return
+			if next_military >  self.ids._maininfo.residents:
+				return
 			cost = self.ids["_multipage"].ids["_militarypage"].get_train_cost('shieldman') * unit
 			if self.ids["_maininfo"].resources >= cost:
 				shieldman = self.ids["_multipage"].ids["_militarypage"].shieldman + unit
-				if self.ids["_maininfo"].residents >=  shieldman:
-					self.ids["_multipage"].ids["_militarypage"].shieldman = shieldman
-					self.ids["_maininfo"].resources -= cost
-					self.ids["_multipage"].ids["_militarypage"].update() 
-					# sync to war page
-					self.ids._multipage.ids._warpage.shieldman_max = shieldman
-					self.ids._multipage.ids._warpage.update()
+				#if self.ids["_maininfo"].residents >=  shieldman:
+				self.ids["_multipage"].ids["_militarypage"].shieldman = shieldman
+				# sync to service
+				self.service_set_military('shieldman', shieldman)
+				# move to service
+				self.service_resources_decrease(cost)
+				#self.ids["_maininfo"].resources -= cost
+				self.ids["_multipage"].ids["_militarypage"].update() 
+				# sync to war page
+				self.ids._multipage.ids._warpage.shieldman_max = shieldman
+				self.ids._multipage.ids._warpage.update()
         # set unit = 0 after done
         #self.ids["_multipage"].ids["_militarypage"].unit = 0
         #self.ids["_multipage"].ids["_militarypage"].update()
@@ -509,16 +545,22 @@ class RootWidget(BoxLayout):
 				self.ids._multipage.ids._militarypage.cavalryman + unit
 			if next_military > self.ids._multipage.ids._buildingpage.camp * 5:
 				return
+			if next_military >  self.ids._maininfo.residents:
+				return
 			cost = self.ids["_multipage"].ids["_militarypage"].get_train_cost('archer') * unit
 			if self.ids["_maininfo"].resources >= cost:
 				archer = self.ids["_multipage"].ids["_militarypage"].archer + unit
-				if self.ids["_maininfo"].residents >=  archer:
-					self.ids["_multipage"].ids["_militarypage"].archer = archer
-					self.ids["_maininfo"].resources -= cost
-					self.ids["_multipage"].ids["_militarypage"].update()
-					# sync to war page
-					self.ids._multipage.ids._warpage.archer_max = archer
-					self.ids._multipage.ids._warpage.update()
+				#if self.ids["_maininfo"].residents >=  archer:
+				self.ids["_multipage"].ids["_militarypage"].archer = archer
+				# sync to service
+				self.service_set_military('archer', archer)
+				# move to service
+				self.service_resources_decrease(cost)
+				#self.ids["_maininfo"].resources -= cost
+				self.ids["_multipage"].ids["_militarypage"].update()
+				# sync to war page
+				self.ids._multipage.ids._warpage.archer_max = archer
+				self.ids._multipage.ids._warpage.update()
 
 	def train_cavalryman(self, instance):
 		print("train cavalryman")
@@ -530,21 +572,64 @@ class RootWidget(BoxLayout):
 				self.ids._multipage.ids._militarypage.cavalryman + unit
 			if next_military > self.ids._multipage.ids._buildingpage.camp * 5:
 				return
+			if next_military >  self.ids._maininfo.residents:
+				return
 			cost = self.ids["_multipage"].ids["_militarypage"].get_train_cost('cavalryman') * unit
 			if self.ids["_maininfo"].resources >= cost:
 				cavalryman = self.ids["_multipage"].ids["_militarypage"].cavalryman + unit
-				if self.ids["_maininfo"].residents >=  cavalryman:
-					self.ids["_multipage"].ids["_militarypage"].cavalryman = cavalryman
-					self.ids["_maininfo"].resources -= cost
-					self.ids["_multipage"].ids["_militarypage"].update()
-					# sync to war page
-					self.ids._multipage.ids._warpage.cavalryman_max = cavalryman
-					self.ids._multipage.ids._warpage.update()
+				#if self.ids["_maininfo"].residents >=  cavalryman:
+				self.ids["_multipage"].ids["_militarypage"].cavalryman = cavalryman
+				# sync to service
+				self.service_set_military('cavalryman', cavalryman)
+				# move to service
+				self.service_resources_decrease(cost)
+				#self.ids["_maininfo"].resources -= cost
+				self.ids["_multipage"].ids["_militarypage"].update()
+				# sync to war page
+				self.ids._multipage.ids._warpage.cavalryman_max = cavalryman
+				self.ids._multipage.ids._warpage.update()
+
+	def service_set_military(self, military, units):
+		units_str = str(units).encode('utf8')
+		if military == 'lancer':
+			App.get_running_app().client.send_message(\
+				b'/set_lancer', [units_str])
+		elif military == 'shieldman':
+			App.get_running_app().client.send_message(\
+				b'/set_shieldman', [units_str])
+		elif military == 'archer':
+			App.get_running_app().client.send_message(\
+				b'/set_archer', [units_str])
+		elif military == 'cavalryman':
+			App.get_running_app().client.send_message(\
+				b'/set_cavalryman', [units_str])
+
+	def service_double_gathering(self):
+		gain = 3600
+		gain_str = str(gain).encode('utf8')
+		App.get_running_app().client.send_message(\
+			b'/gain_double_gathering', [gain_str])
+
+	def service_double_payload(self):
+		gain = 3600
+		gain_str = str(gain).encode('utf8')
+		App.get_running_app().client.send_message(\
+			b'/gain_double_payload', [gain_str])
+
+	def service_resources_increase(self, cost):
+		cost_str = str(cost).encode('utf8')
+		App.get_running_app().client.send_message(\
+			b'/resources_increase', [cost_str])
 
 	def service_resources_decrease(self, cost):
 		cost_str = str(cost).encode('utf8')
 		App.get_running_app().client.send_message(\
 			b'/resources_decrease', [cost_str])
+
+	def service_dismiss_military(self):
+		print("service_dismiss_military()")
+		App.get_running_app().client.send_message(\
+			b'/dismiss_military', [])
 
 	def upgrade_castle(self, instance):
         #print("upgrade castle")
@@ -709,16 +794,20 @@ class RootWidget(BoxLayout):
 			self.ids["_multipage"].ids["_managepage"].mines -= increase
         #self.update()
 
-	def resources_received(self, res, ins, remain):
-		print("showing resources", res.decode('utf8'))
-		print("showing increase: ", ins.decode('utf8'))
-		print("showing dg time: ", remain.decode('utf8'))
+	def resources_received(self, res, inc, dg_remain, dp_remain):
+		#print("showing resources", res.decode('utf8'))
+		#print("showing increase: ", inc.decode('utf8'))
+		#print("showing dg time: ", dg_remain.decode('utf8'))
+		#print("showing dp time: ", dp_remain.decode('utf8'))
+
 		#msg = message.decode('utf8')
 		#value = int(msg)
 		self.ids._maininfo.resources = int(res.decode('utf8'))
-		self.ids._maininfo.resources_increase = int(ins.decode('utf8'))
+		self.ids._maininfo.resources_increase = int(inc.decode('utf8'))
 		self.ids._multipage.ids._storepage.double_gathering_time = \
-			int(remain.decode('utf8'))
+			int(dg_remain.decode('utf8'))
+		self.ids._multipage.ids._storepage.double_payload_time = \
+			int(dp_remain.decode('utf8'))
 
 class GameApp(App):
 	userid = "999999"

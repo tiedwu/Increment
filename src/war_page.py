@@ -49,7 +49,7 @@ def get_military_abilities(military_info):
 
 def is_alive(army):
 	c = sum([army[x][1] for x in range(len(army))])
-	return False if c == 0 else True
+	return False if c <= 0 else True
 
 def get_fortune():
 	return True if randint(1,  100)  <  25 else False
@@ -109,6 +109,16 @@ def fight(g1,  g2):
 	MAXLOOP = 5
 	nLoop = 0
 	WIN = False
+
+	# if enemy military == zero: WIN
+	if not g2:
+		WIN = True
+		for n in range(len(g1)):
+			military, amount = g1[n][0], g1[n][1]
+			result['resources'] += unit_military_abilities[military][3] * amount
+			result['soldiers'][military] = amount
+		return result
+
 	while nLoop < MAXLOOP:
 		print("Loop [%d]" % nLoop)
 		g1_military = g1[0][0]
