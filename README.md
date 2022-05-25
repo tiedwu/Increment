@@ -13,3 +13,7 @@ git push origin v1.0:v1.0
 # Known Issues
 1. press over 1 seconds
 2. soldiers is negative even attackiing successful (fixed)
+
+# adb push/pull
+adb push <file> <android-folder>
+adb pull <android-file-path>
