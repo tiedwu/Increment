@@ -610,6 +610,11 @@ class RootWidget(BoxLayout):
 		App.get_running_app().client.send_message(\
 			b'/gain_double_gathering', [gain_str])
 
+	def service_set_residents(self, amount):
+		amount_str = str(amount).encode('utf8')
+		App.get_running_app().client.send_message(\
+			b'/set_residents', [amount_str])
+
 	def service_double_payload(self):
 		gain = 3600
 		gain_str = str(gain).encode('utf8')
@@ -704,6 +709,9 @@ class RootWidget(BoxLayout):
 			self.ids["_maininfo"].residents += castle_lv * 1
 			if self.ids["_maininfo"].residents > residents_limit:
 				self.ids["_maininfo"].residents = residents_limit
+
+			# sync residentes to service
+			self.service_set_residents(self.ids._maininfo.residents)
 
 		# crystal taking count down
 		if self.ids._multipage.ids._storepage.crystal_countdown > 0:

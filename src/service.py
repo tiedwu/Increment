@@ -31,6 +31,11 @@ class GameService(OSCThreadServer):
 		self.bind(b'/set_cavalryman', self.set_cavalryman)
 		self.bind(b'/gain_double_gathering', self.gain_double_gathering)
 		self.bind(b'/gain_double_payload', self.gain_double_payload)
+		self.bind(b'/set_residents', self.set_residents)
+
+	def set_residents(self, arg):
+		residents = int(arg.decode('utf8'))
+		self.data["residents"] = residents
 
 	def gain_double_gathering(self, arg):
 		gain = int(arg.decode('utf8'))

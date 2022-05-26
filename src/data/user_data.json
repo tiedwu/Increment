@@ -21003,9 +21003,9 @@
         "nickname": "宿星河",
         "buildings": {
             "castle": 20004,
-            "house": 20028,
+            "house": 26000,
             "guard": 17,
-            "camp": 5044 
+            "camp": 6400
         },
         "resources": 38069736572,
         "resources_increase": 154028,
