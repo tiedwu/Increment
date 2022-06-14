@@ -32,6 +32,7 @@ def testwrite():
 	try:
 		Logger.info('Got requested permissions')
 		fname = os.path.join(primary_external_storage_path(), 'testfile')
+		#fname = os.path.join(app_storage_path(), 'testfile')
 		log('writing to : %s' % fname)
 
 		with open(fname, 'wb') as f:

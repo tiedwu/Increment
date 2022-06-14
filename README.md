@@ -17,3 +17,10 @@ git push origin v1.0:v1.0
 # adb push/pull
 adb push <file> <android-folder>
 adb pull <android-file-path>
+
+3. write down android path for tip
+
+# app storage path
+/data/user/0/org.kivy.writetest/files/<file>
+# primary external storage path
+/storage/emulated/0/<file> 
