@@ -10,7 +10,7 @@ package.name = writetest
 package.domain = org.kivy
 
 # (str) Source code where the main.py live
-source.dir = empire-era/src
+source.dir = src
 
 # (list) Source files to include (let empty to include all the files)
 source.include_exts = py,png,jpg,kv,atlas,json,wav,ttf
@@ -388,7 +388,7 @@ log_level = 2
 warn_on_root = 0
 
 # (str) Path to build artifact storage, absolute or relative to spec file
-#build_dir = /home/kivydev/test/projs/oscservice/.buildozer 
+build_dir = /home/kivydev/test/projs/.buildozer 
 
 # (str) Path to build output (i.e. .apk, .aab, .ipa) storage
 # bin_dir = ./bin
